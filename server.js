@@ -96,7 +96,7 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 // ================= DEPARTMENTS =================
-app.get('/api/departments', requireAuth, (req, res) => {
+app.get('/api/departments', /*requireAuth,*/ (req, res) => {
   const rows = db.prepare('SELECT * FROM departments ORDER BY name').all();
   res.json(rows);
 });
