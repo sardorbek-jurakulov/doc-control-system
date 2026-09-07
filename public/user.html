@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мои документы — ДОК-КОНТРОЛЬ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>ДОК-КОНТРОЛЬ</div>
+  <div class="right">
+    <button onclick="toggleNotifications()" style="position:relative">🔔 Уведомления<span id="notifDot"></span></button>
+    <span class="userinfo" id="whoami"></span>
+    <button onclick="logout()">Выйти</button>
+  </div>
+</div>
+<div class="layout">
+  <div class="content" style="max-width:900px;margin:0 auto;width:100%">
+    <div id="notifPanel" class="card" style="display:none"></div>
+    <div class="stat-row" id="statRow"></div>
+    <div class="card">
+      <div class="card-header"><h2>Мои документы для изучения</h2></div>
+      <div id="docsList"></div>
+    </div>
+  </div>
+</div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+<script src="user.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Панель администратора — ДОК-КОНТРОЛЬ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>ДОК-КОНТРОЛЬ · Администратор</div>
+  <div class="right">
+    <span class="userinfo" id="whoami"></span>
+    <button onclick="logout()">Выйти</button>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <button class="active" data-tab="documents" onclick="switchTab('documents')">📄 Документы</button>
+    <button data-tab="users" onclick="switchTab('users')">👥 Сотрудники</button>
+    <button data-tab="departments" onclick="switchTab('departments')">🏢 Подразделения</button>
+    <button data-tab="reports" onclick="switchTab('reports')">📊 Отчёты</button>
+    <button data-tab="history" onclick="switchTab('history')">🕘 История</button>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

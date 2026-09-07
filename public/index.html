@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход — Система контроля ознакомления</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="brand"><span class="dot"></span><strong>ДОК-КОНТРОЛЬ</strong></div>
+    <h1>Система контроля ознакомления</h1>
+    <div class="sub">с внутренними документами предприятия</div>
+
+    <div class="tabs-switch">
+      <button id="tabLogin" class="active" onclick="showTab('login')">Вход</button>
+      <button id="tabReg" onclick="showTab('reg')">Регистрация</button>
+    </div>
+
+    <div id="errorBox"></div>
+
+    <form id="loginForm">
+      <div class="field"><label>Логин</label><input id="loginLogin" required autocomplete="username"></div>
+      <div class="field"><label>Пароль</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
+      <button class="btn" style="width:100%" type="submit">Войти</button>
+    </form>
+
+    <form id="regForm" style="display:none">
+      <div class="grid2">
+        <div class="field"><label>Фамилия *</label><input id="regSurname" required></div>
+        <div class="field"><label>Имя *</label><input id="regName" required></div>
+      </div>
+      <div class="field"><label>Отчество</label><input id="regPatronymic"></div>
+      <div class="grid2">
+        <div class="field"><label>Табельный номер *</label><input id="regTabel" required></div>
+        <div class="field"><label>Подразделение</label><select id="regDept"><option value="">— не выбрано —</option></select></div>
+      </div>
+      <div class="field"><label>Логин *</label><input id="regLogin" required></div>
+      <div class="field"><label>Пароль *</label><input id="regPassword" type="password" required></div>
+      <button class="btn" style="width:100%" type="submit">Зарегистрироваться</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function showTab(t){
+  document.getElementById('tabLogin').classList.toggle('active', t==='login');
+  document.getElementById('tabReg').classList.toggle('active', t==='reg');
+  document.getElementById('loginForm').style.display = t==='login' ? 'block':'none';
+  document.getElementById('regForm').style.display = t==='reg' ? 'block':'none';
+  document.getElementById('errorBox').innerHTML='';
+}
+function showError(msg){
+  document.getElementById('errorBox').innerHTML = `<div class="error-msg">${msg}</div>`;
+}
+
+async function loadDepartmentsForSelect(){
+  try{
+    const res = await fetch('/api/departments');
+    if(!res.ok) return;
+    const deps = await res.json();
+    const sel = document.getElementById('regDept');
+    deps.forEach(d=>{
+      const opt = document.createElement('option');
+      opt.value=d.id; opt.textContent=d.name;
+      sel.appendChild(opt);
+    });
+  }catch(e){}
+}
+loadDepartmentsForSelect();
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const login = document.getElementById('loginLogin').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const res = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({login,password})});
+  const data = await res.json();
+  if(!res.ok){ showError(data.error || 'Ошибка входа'); return; }
+  location.href = data.user.role === 'admin' ? 'admin.html' : 'user.html';
+});
+
+document.getElementById('regForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const payload = {
+    surname: document.getElementById('regSurname').value.trim(),
+    name: document.getElementById('regName').value.trim(),
+    patronymic: document.getElementById('regPatronymic').value.trim(),
+    tabel_number: document.getElementById('regTabel').value.trim(),
+    department_id: document.getElementById('regDept').value || null,
+    login: document.getElementById('regLogin').value.trim(),
+    password: document.getElementById('regPassword').value,
+  };
+  const res = await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data = await res.json();
+  if(!res.ok){ showError(data.error || 'Ошибка регистрации'); return; }
+  showTab('login');
+  document.getElementById('loginLogin').value = payload.login;
+  showError('Регистрация выполнена. Теперь вы можете войти.');
+  document.querySelector('.error-msg').style.background = '#e9f7ef';
+  document.querySelector('.error-msg').style.color = '#2f855a';
+});
+
+// Проверка — если уже авторизован, перекинуть сразу
+fetch('/api/auth/me').then(r=>r.ok?r.json():null).then(d=>{
+  if(d && d.user){ location.href = d.user.role==='admin' ? 'admin.html' : 'user.html'; }
+});
+</script>
+</body>
+</html>
